@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
-const PORT = 3006;
+app.use(express.json());
+const PORT = 3005;
 
 // imports
 // helmet
@@ -10,9 +11,9 @@ const PORT = 3006;
 
 // my middleware
 // my routes
-
+const recipeRouter = require("./routes/recipeRouter.js");
+app.use("/api/recipes", recipeRouter);
 // middleware
-app.use(express.json());
 
 // routes
 app.get("/", (req, res) => {
@@ -21,4 +22,13 @@ app.get("/", (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`server running on port ${PORT}`);
+});
+
+// Error Handling Middleware (always in the END)
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(err.status || 500).json({
+    success: false,
+    message: err.message || "Server Error",
+  });
 });
