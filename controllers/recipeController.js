@@ -3,14 +3,15 @@ const recipes = require("../models/recipeModel");
 let counter = 4;
 
 const getAllRecipes = () => {
-  return recipes;
+  return recipes.getRecipes();
 };
 
 const getStats = () => {
-  const totalRecipes = recipes.length;
+  const allRecipes = recipes.getRecipes();
+  const totalRecipes = allRecipes.length;
   const avgCookingTime =
-    recipes.map((a) => a.cookingTime).reduce((a, b) => a + b) / totalRecipes;
-  const numRecipesByDifficulty = recipes.reduce((ac, cur) => {
+    allRecipes.map((a) => a.cookingTime).reduce((a, b) => a + b) / totalRecipes;
+  const numRecipesByDifficulty = allRecipes.reduce((ac, cur) => {
     ac[cur.difficulty] = ac[cur.difficulty]
       ? (ac[cur.difficulty] += 1)
       : (ac[cur.difficulty] = 1);
@@ -25,7 +26,7 @@ const getRecipeById = (id) => {
     throw new Error("no id found");
   }
 
-  const recipe = recipes.find((recipe) => recipe.id === id);
+  const recipe = recipes.getRecipes().find((recipe) => recipe.id === id);
 
   if (!recipe) {
     throw new Error("recipe not found");
@@ -39,11 +40,11 @@ const addRecipe = (recipeInput) => {
     throw new Error("no recipe input");
   }
 
-  const id = ++counter; // confirm unique
+  const id = String(++counter); // confirm unique
   const createdAt = new Date(Date.now()).toUTCString();
 
   const recipe = { ...recipeInput, id, createdAt };
-  recipes.push(recipe);
+  recipes.addRecipe(recipe);
   return recipe;
 };
 
@@ -56,12 +57,14 @@ const updateRecipeById = (id, modifiedRecipe) => {
     throw new Error("no modified recipe");
   }
 
-  const storedRecipeIndex = recipes.findIndex((recipe) => recipe.id === id);
+  const storedRecipeIndex = recipes
+    .getRecipes()
+    .findIndex((recipe) => recipe.id === id);
   if (storedRecipeIndex < 0 || storedRecipeIndex >= recipes.length) {
     throw new Error("could not find recipe index");
   }
 
-  const storedRecipe = recipes[storedRecipeIndex];
+  const storedRecipe = recipes.getRecipeByIndex(storedRecipeIndex);
   if (!storedRecipe) {
     throw new Error("recipe not found");
   }
@@ -77,7 +80,7 @@ const updateRecipeById = (id, modifiedRecipe) => {
     throw new Error("cannot change immutable fields");
   }
 
-  recipes[storedRecipeIndex] = modifiedRecipe;
+  recipes.updateRecipe(storedRecipeIndex, modifiedRecipe);
   return modifiedRecipe;
 };
 
@@ -86,12 +89,14 @@ const deleteRecipeById = (id) => {
     throw new Error("no id to delete");
   }
 
-  const storedRecipeIndex = recipes.findIndex((recipe) => recipe.id === id);
+  const storedRecipeIndex = recipes
+    .getRecipes()
+    .findIndex((recipe) => recipe.id === id);
   if (storedRecipeIndex < 0 || storedRecipeIndex >= recipes.length) {
     throw new Error("could not find recipe index");
   }
 
-  recipes.splice(storedRecipeIndex, 1);
+  recipes.deleteRecipe(storedRecipeIndex);
   return storedRecipeIndex;
 };
 
