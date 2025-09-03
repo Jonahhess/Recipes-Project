@@ -1,0 +1,5 @@
+{
+  "$id": "https://example.com/schemas/recipeInput.json",
+  "allOf": [{ "$ref": "https://example.com/schemas/recipeBaseSchema.json" }],
+  "additionalProperties": false
+}

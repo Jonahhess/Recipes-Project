@@ -1,0 +1,8 @@
+{
+  "$id": "https://example.com/schemas/recipePut.json",
+  "allOf": [
+    { "$ref": "https://example.com/schemas/recipeBaseSchema.json" },
+    { "$ref": "https://example.com/schemas/generatedFields.json" }
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,9 @@
+{
+  "$id": "https://example.com/schemas/generatedFieldsSchema.json",
+  "type": "object",
+  "properties": {
+    "id": { "type": "string", "immutable": true },
+    "createdAt": { "type": "string", "format": "date-time", "immutable": true }
+  },
+  "required": ["id", "createdAt"]
+}
