@@ -1,5 +1,7 @@
 const recipes = require("../models/recipeModel");
 
+let counter = 4;
+
 const getAllRecipes = () => {
   return recipes;
 };
@@ -18,4 +20,86 @@ const getStats = () => {
   return { totalRecipes, avgCookingTime, numRecipesByDifficulty };
 };
 
-module.exports = { getAllRecipes, getStats };
+const getRecipeById = (id) => {
+  if (!id) {
+    throw new Error("no id found");
+  }
+
+  const recipe = recipes.find((recipe) => recipe.id === id);
+
+  if (!recipe) {
+    throw new Error("recipe not found");
+  }
+
+  return recipe;
+};
+
+const addRecipe = (recipeInput) => {
+  if (!recipeInput) {
+    throw new Error("no recipe input");
+  }
+
+  const id = ++counter; // confirm unique
+  const createdAt = new Date(Date.now()).toUTCString();
+
+  const recipe = { ...recipeInput, id, createdAt };
+  recipes.push(recipe);
+  return recipe;
+};
+
+const updateRecipeById = (id, modifiedRecipe) => {
+  if (!id) {
+    throw new Error("no id here");
+  }
+
+  if (!modifiedRecipe) {
+    throw new Error("no modified recipe");
+  }
+
+  const storedRecipeIndex = recipes.findIndex((recipe) => recipe.id === id);
+  if (storedRecipeIndex < 0 || storedRecipeIndex >= recipes.length) {
+    throw new Error("could not find recipe index");
+  }
+
+  const storedRecipe = recipes[storedRecipeIndex];
+  if (!storedRecipe) {
+    throw new Error("recipe not found");
+  }
+
+  if (!modifiedRecipe.id || !modifiedRecipe.createdAt) {
+    throw new Error("missing generated fields in modified recipe");
+  }
+
+  if (
+    id !== modifiedRecipe.id ||
+    storedRecipe.createdAt !== modifiedRecipe.createdAt
+  ) {
+    throw new Error("cannot change immutable fields");
+  }
+
+  recipes[storedRecipeIndex] = modifiedRecipe;
+  return modifiedRecipe;
+};
+
+const deleteRecipeById = (id) => {
+  if (!id) {
+    throw new Error("no id to delete");
+  }
+
+  const storedRecipeIndex = recipes.findIndex((recipe) => recipe.id === id);
+  if (storedRecipeIndex < 0 || storedRecipeIndex >= recipes.length) {
+    throw new Error("could not find recipe index");
+  }
+
+  recipes.splice(storedRecipeIndex, 1);
+  return storedRecipeIndex;
+};
+
+module.exports = {
+  getAllRecipes,
+  getStats,
+  getRecipeById,
+  addRecipe,
+  updateRecipeById,
+  deleteRecipeById,
+};
