@@ -1,7 +1,9 @@
 const Ajv = require("ajv");
 const addFormats = require("ajv-formats");
 
+// consider using the controller function getAllRecipes instead of direct access to the model
 const recipes = require("../models/recipeModel.js");
+
 const recipePost = require("../schemas/recipeInputSchema.json");
 const recipePut = require("../schemas/recipeSchema.json");
 
