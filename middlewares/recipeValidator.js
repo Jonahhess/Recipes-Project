@@ -2,7 +2,6 @@ const Ajv = require("ajv");
 const addFormats = require("ajv-formats");
 
 const recipes = require("../models/recipeModel.js");
-
 const recipePost = require("../schemas/recipeInputSchema.json");
 const recipePut = require("../schemas/recipeSchema.json");
 
@@ -34,9 +33,8 @@ const validatePut = (req, res, next) => {
   }
 
   const { id, createdAt } = storedRecipe;
-  const { putId, putCreatedAt } = req.body;
 
-  if (id !== putId || createdAt !== putCreatedAt) {
+  if (id !== req.body.id || createdAt !== req.body.createdAt) {
     return res.status(400).send("cannot change immutable fields");
   }
 
