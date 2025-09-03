@@ -1,42 +1,25 @@
 const Ajv = require("ajv");
 const addFormats = require("ajv-formats");
 
-const recipeBase = require("./schemas/recipeBaseSchema.json");
-const recipeSystem = require("./schemas/generatedFieldSchema.json");
-const recipePost = require("./schemas/recipeInputSchema.json");
-const recipePut = require("./schemas/recipeSchema.json");
+const recipes = require("../models/recipeModel.js");
+
+const recipePost = require("../schemas/recipeInputSchema.json");
+const recipePut = require("../schemas/recipeSchema.json");
 
 const ajv = new Ajv({ allErrors: true });
 addFormats(ajv);
 
-// Custom keyword: immutable fields
-ajv.addKeyword({
-  keyword: "immutable",
-  schemaType: "boolean",
-  validate: function immutableFn(schema, data, parentSchema, ctx) {
-    if (!schema) return true;
-    const field = ctx.parentDataProperty;
-    const storedValue = ctx.rootData?.__original?.[field];
-    if (storedValue !== undefined && data !== storedValue) {
-      return false;
-    }
-    return true;
-  },
-  errors: true,
-});
-
 // Register schemas
-ajv.addSchema(recipeBase);
-ajv.addSchema(recipeSystem);
 ajv.addSchema(recipePost);
 ajv.addSchema(recipePut);
 
 // Validators
-const postSchema = ajv.getSchema("https://example.com/schemas/recipePost.json");
-const putSchema = ajv.getSchema("https://example.com/schemas/recipePut.json");
+const postSchema = ajv.compile(recipePost);
+const putSchema = ajv.compile(recipePut);
 
 // POST: system fields disallowed (manual or via `readOnly` keyword)
 const validatePost = (req, res, next) => {
+  console.log(req.body);
   if (!postSchema(req.body)) {
     return res.status(400).json({ errors: postSchema.errors });
   }
@@ -45,13 +28,23 @@ const validatePost = (req, res, next) => {
 
 // PUT: system fields required but immutable
 const validatePut = (req, res, next) => {
-  const storedRecipe = db.recipes.findById(req.params.id);
+  const storedRecipe = recipes.find((recipe) => recipe.id == req.params.id);
+  if (!storedRecipe) {
+    return res.status(400).send("recipe not found");
+  }
 
-  const valid = putSchema({ ...req.body, __original: storedRecipe });
+  const { id, createdAt } = storedRecipe;
+  const { putId, putCreatedAt } = req.body;
+
+  if (id !== putId || createdAt !== putCreatedAt) {
+    return res.status(400).send("cannot change immutable fields");
+  }
+
+  const valid = putSchema({ ...req.body });
   if (!valid) {
     return res.status(400).json({ errors: putSchema.errors });
   }
   next();
 };
 
-module.export = { validatePost, validatePut };
+module.exports = { validatePost, validatePut };

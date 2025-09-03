@@ -1,8 +1,43 @@
 {
-  "$id": "https://example.com/schemas/recipePut.json",
-  "allOf": [
-    { "$ref": "https://example.com/schemas/recipeBaseSchema.json" },
-    { "$ref": "https://example.com/schemas/generatedFields.json" }
+  "$id": "2",
+  "type": "object",
+  "properties": {
+    "id": { "type": "string" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "title": { "type": "string", "minLength": 3, "maxLength": 100 },
+    "description": { "type": "string", "minLength": 10, "maxLength": 500 },
+    "ingredients": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "instructions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "cookingTime": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "servings": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "difficulty": {
+      "enum": ["easy", "medium", "hard"]
+    }
+  },
+  "required": [
+    "id",
+    "createdAt",
+    "title",
+    "description",
+    "ingredients",
+    "instructions",
+    "cookingTime",
+    "servings",
+    "difficulty"
   ],
   "additionalProperties": false
 }
