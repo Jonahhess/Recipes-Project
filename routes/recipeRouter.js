@@ -4,13 +4,21 @@ const {
   validatePost,
   validatePut,
 } = require("../middlewares/recipeValidator.js");
+const {
+  getAllRecipes,
+  getStats,
+} = require("../controllers/recipeController.js");
 
 // static routes
 router.get("/", (req, res) => {
+  const allRecipes = getAllRecipes();
+  console.log(allRecipes);
   res.send("getting all recipes");
 });
 
 router.get("/stats", (req, res) => {
+  const stats = getStats();
+  console.log(stats);
   res.send("getting stats");
 });
 
