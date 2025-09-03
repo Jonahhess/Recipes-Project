@@ -6,6 +6,8 @@ const PORT = 3005;
 // imports
 // helmet
 // cors
+const morgan = require("morgan");
+app.use(morgan("combined"));
 
 // my imports
 
