@@ -1,7 +1,14 @@
 const { readFileSync, writeFileSync } = require("fs");
 const path = require("path");
 const filePath = path.resolve(__dirname, "../data/recipes.json");
-const recipes = JSON.parse(readFileSync(filePath));
+
+let recipes = [];
+try {
+  recipes = JSON.parse(readFileSync(filePath));
+} catch (err) {
+  console.error("Error reading recipes file:", err);
+  recipes = [];
+}
 
 const getRecipes = () => {
   return recipes;
@@ -13,18 +20,31 @@ const getRecipeByIndex = (index) => {
 
 const addRecipe = (recipe) => {
   recipes.push(recipe);
-  writeFileSync(filePath, JSON.stringify(recipes));
+  try {
+    writeFileSync(filePath, JSON.stringify(recipes));
+  } catch (err) {
+    console.error("Error writing recipes file:", err);
+  }
 };
 
 const updateRecipe = (index, modifiedRecipe) => {
   recipes[index] = modifiedRecipe;
-  writeFileSync(filePath, JSON.stringify(recipes));
+  try {
+    writeFileSync(filePath, JSON.stringify(recipes));
+  } catch (err) {
+    console.error("Error writing recipes file:", err);
+  }
 };
 
 const deleteRecipe = (index) => {
   recipes.splice(index, 1);
-  writeFileSync(filePath, JSON.stringify(recipes));
+  try {
+    writeFileSync(filePath, JSON.stringify(recipes));
+  } catch (err) {
+    console.error("Error writing recipes file:", err);
+  }
 };
+
 module.exports = {
   getRecipes,
   getRecipeByIndex,
