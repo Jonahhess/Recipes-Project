@@ -1,5 +1,3 @@
-const recipes = require("../models/recipeModel");
-
 let counter = 4;
 
 const getAllRecipes = () => {
