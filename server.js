@@ -1,30 +1,33 @@
-const express = require("express");
-const app = express();
-app.use(express.json());
 const PORT = 3005;
 
-// imports
-// helmet
-// cors
+const express = require("express");
 const morgan = require("morgan");
-app.use(morgan("combined"));
 
-// my imports
-
-// my middleware
-// my routes
 const recipeRouter = require("./routes/recipeRouter.js");
+const authRouter = require("./routes/authRouter.js");
+
+const { sequelize } = require("./db/setup.js");
+const app = express();
+app.use(express.json());
+app.use(morgan("combined"));
+app.use("/api/auth", authRouter);
 app.use("/api/recipes", recipeRouter);
-// middleware
 
 // routes
 app.get("/", (req, res) => {
   res.send("Welcome to the website");
 });
 
-app.listen(PORT, () => {
-  console.log(`server running on port ${PORT}`);
-});
+sequelize
+  .sync({ force: true }) // or { force: true } for dropping/recreating tables
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`server running on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("Failed to sync database:", err);
+  });
 
 // Error Handling Middleware (always in the END)
 app.use((err, req, res, next) => {
